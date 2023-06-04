@@ -2,12 +2,12 @@ import { ReadStream } from 'fs';
 
 export type LocationId = string & { locationId: true };
 export type LocationTag = string & { locationTag: true };
-export type AreaRequestId = string & { areaRequestId: true };
+export type AreaLookupId = string & { areaLookupId: true };
 
 export type Location = {
   guid: LocationId;
   isActive: boolean;
-  location: string;
+  address: string;
   latitude: number;
   longitude: number;
   tags: LocationTag[];
@@ -24,5 +24,5 @@ export type ILocationRepository = {
   fetch(id: LocationId): Promise<Location | undefined>;
   fetchAll(): Promise<Location[]>;
   fetchByTag(tag: LocationTag): Promise<Location[]>;
-  loadAll(): ReadStream;
+  loadSource(): ReadStream;
 };

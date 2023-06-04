@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import path from 'node:path';
+import { join } from 'node:path';
 import { LocationRepository } from './location.repository';
 import { LocationService } from './location.service';
 
@@ -8,9 +8,10 @@ import { LocationService } from './location.service';
     {
       provide: LocationService.name,
       useFactory: async () => {
-        const filePath = path.join(__dirname, '../../db/locations.json');
+        const filePath = join(__dirname, '../../db/locations.json');
+        const locationRepository = await LocationRepository.create(filePath);
 
-        return new LocationService(await LocationRepository.create(filePath));
+        return new LocationService(locationRepository);
       },
     },
   ],

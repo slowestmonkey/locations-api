@@ -28,8 +28,8 @@ To run the tests, run `yarn test:e2e`.
 ### Todo
 
 - add proper validation and DTOs for representation layer
-- add Swagger documentation
 - use different for prod and testing, add unit tests
-- add config module and service (e.g. for storing `dbConnectionString`)
+- add config module and service (e.g. for storing `dbConnectionString` and server params, like host address)
 - improve auth checks
-- enhance error handling
+- enhance error handling (e.g. throw `NotFound` if distance calculation location is not found)
+- add Swagger documentation

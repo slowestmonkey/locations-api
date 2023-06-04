@@ -10,11 +10,10 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthGuard } from './auth/auth.guard';
 import {
-  AreaRequestId,
+  AreaLookupId,
   DistanceDetails,
   Location,
   LocationId,
@@ -23,7 +22,6 @@ import {
 import { LocationService } from './location/location.service';
 
 @UseGuards(AuthGuard)
-@ApiUnauthorizedResponse()
 @Controller()
 export class AppController {
   constructor(
@@ -40,11 +38,11 @@ export class AppController {
   }
 
   @Get('/distance')
-  async fetchDistance(
+  async fetchDistanceDetails(
     @Query('from') from: LocationId,
     @Query('to') to: LocationId,
   ): Promise<DistanceDetails> {
-    return this.locationService.fetchDistance(from, to);
+    return this.locationService.fetchDistanceDetails(from, to);
   }
 
   @Get('/area')
@@ -53,7 +51,7 @@ export class AppController {
     @Query('distance', ParseIntPipe) distance: number,
     @Res() res: Response,
   ): Promise<void> {
-    const requestId = '2152f96f-50c7-4d76-9e18-f7033bd14428' as AreaRequestId;
+    const requestId = '2152f96f-50c7-4d76-9e18-f7033bd14428' as AreaLookupId;
     const resultsUrl = `http://127.0.0.1:8080/area-result/${requestId}`;
 
     res.status(HttpStatus.ACCEPTED).send({ resultsUrl });
@@ -61,13 +59,13 @@ export class AppController {
     this.locationService.lookupByArea(requestId, from, distance);
   }
 
-  @Get('/area-result/:areaRequestId')
-  async fetchByArea(
-    @Param('areaRequestId') requestId: AreaRequestId,
+  @Get('/area-result/:areaLookupId')
+  async fetchLookupByAreaResult(
+    @Param('areaLookupId') areaLookupId: AreaLookupId,
     @Res() res: Response,
   ): Promise<void> {
     const foundByArea = await this.locationService.fetchLookupByAreaResult(
-      requestId,
+      areaLookupId,
     );
 
     foundByArea
@@ -76,8 +74,8 @@ export class AppController {
   }
 
   @Get('/all-cities')
-  async getFile(@Res() res: Response): Promise<void> {
-    const stream = this.locationService.loadAll();
+  async loadAllCities(@Res() res: Response): Promise<void> {
+    const stream = this.locationService.loadSource();
 
     stream.pipe(res);
   }

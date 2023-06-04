@@ -1,16 +1,16 @@
 import { ReadStream } from 'node:fs';
 import { calculateDistance } from '../shared/distance';
 import {
+  AreaLookupId,
+  DistanceDetails,
+  ILocationRepository,
   Location,
   LocationId,
   LocationTag,
-  AreaRequestId,
-  DistanceDetails,
-  ILocationRepository,
 } from './location';
 
 export class LocationService {
-  private areaMap: Map<AreaRequestId, Location[]>;
+  private areaMap: Map<AreaLookupId, Location[]>;
 
   constructor(private readonly locationRepository: ILocationRepository) {
     this.areaMap = new Map();
@@ -24,7 +24,7 @@ export class LocationService {
       : locations.filter((location) => location.isActive === isActive);
   }
 
-  async fetchDistance(
+  async fetchDistanceDetails(
     from: LocationId,
     to: LocationId,
   ): Promise<DistanceDetails> {
@@ -39,11 +39,11 @@ export class LocationService {
 
     const distance = calculateDistance(locationFrom, locationTo);
 
-    return { from: locationFrom, to: locationTo, distance, unit: 'km' };
+    return { from: locationFrom, to: locationTo, unit: 'km', distance };
   }
 
   async lookupByArea(
-    requestId: AreaRequestId,
+    areaLookupId: AreaLookupId,
     from: LocationId,
     distance: number,
   ): Promise<void> {
@@ -60,20 +60,24 @@ export class LocationService {
         )
       : [];
 
-    this.areaMap.set(requestId, foundByArea);
+    this.areaMap.set(areaLookupId, foundByArea);
   }
 
   async fetchLookupByAreaResult(
-    requestId: AreaRequestId,
+    areaLookupId: AreaLookupId,
   ): Promise<Location[] | null> {
-    const locations = this.areaMap.get(requestId);
+    const locations = this.areaMap.get(areaLookupId);
 
-    this.areaMap.delete(requestId);
+    if (!locations) {
+      return null;
+    }
 
-    return locations ?? null;
+    this.areaMap.delete(areaLookupId);
+
+    return locations;
   }
 
-  loadAll(): ReadStream {
-    return this.locationRepository.loadAll();
+  loadSource(): ReadStream {
+    return this.locationRepository.loadSource();
   }
 }
