@@ -2,7 +2,7 @@
 
 Demo API to handle city/location requests (e.g. calculating by distance, fetching by area).
 
-Implemented with Nest.js, didn't work with it recently so decided to use the opportunity.
+Implemented with Nest.js, didn't work with it for while so decided to use the opportunity.
 
 # Operations
 
